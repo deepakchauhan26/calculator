@@ -12,15 +12,17 @@
         }
 
         #calcu {
+            margin: 50px;
             border: 1px solid black;
             margin-left: auto;
             margin-right: auto;
+            border-radius: 15px;
         }
 
         input[type="button"] {
             width: 100%;
             padding: 20px 40px;
-            background-color: green;
+            background-color: pink;
             color: white;
             font-size: 24px;
             font-weight: bold;
@@ -43,10 +45,14 @@
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
+            background-color: slategray;
         }
 
         .savedSearch tr:nth-child(even) {
             background-color: #dddddd;
+        }
+        h2{
+            color: blue;
         }
     </style>
 </head>
@@ -84,7 +90,7 @@
             <td><input type="button" value="+" onclick="dis('+')" onkeydown="myFunction(event)"> </td>
         </tr>
     </table>
-    <center><h3>Saved Searches</h3></center>
+    <center><h2>Saved Searches</h2></center>
     <table id="savedSearches"></table>
 
     <script>
