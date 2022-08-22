@@ -1,0 +1,1 @@
+CREATE TABLE `test`.`calendar` (`id` INT NOT NULL AUTO_INCREMENT , `expression` VARCHAR(200) NOT NULL , `result` VARCHAR(200) NOT NULL , `createdOn` DATE NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

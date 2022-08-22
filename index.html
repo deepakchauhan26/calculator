@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- for styling -->
+    <style>
+        #savedSearches {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+        }
+
+        #calcu {
+            border: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            padding: 20px 40px;
+            background-color: green;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            padding: 20px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            border: 2px solid black;
+        }
+
+        .savedSearch td,
+        .savedSearch th,
+        .savedSearch {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .savedSearch tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<!-- create table -->
+
+<body onload="fetchSavedSearches()">
+    <table id="calcu">
+        <tr>
+            <td colspan="3"><input type="text" id="result"></td>
+            <td><input type="button" value="c" onclick="clr()" /> </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="1" onclick="dis('1')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="2" onclick="dis('2')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="3" onclick="dis('3')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="/" onclick="dis('/')" onkeydown="myFunction(event)"> </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="4" onclick="dis('4')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="5" onclick="dis('5')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="6" onclick="dis('6')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="*" onclick="dis('*')" onkeydown="myFunction(event)"> </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="7" onclick="dis('7')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="8" onclick="dis('8')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="9" onclick="dis('9')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="-" onclick="dis('-')" onkeydown="myFunction(event)"> </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="0" onclick="dis('0')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="." onclick="dis('.')" onkeydown="myFunction(event)"> </td>
+            <td><input type="button" value="=" onclick="solve()"> </td>
+
+            <td><input type="button" value="+" onclick="dis('+')" onkeydown="myFunction(event)"> </td>
+        </tr>
+    </table>
+    <center><h3>Saved Searches</h3></center>
+    <table id="savedSearches"></table>
+
+    <script>
+        function dis(val) {
+            document.getElementById("result").value += val
+        }
+
+        function myFunction(event) {
+            if (event.key == '0' || event.key == '1'
+                || event.key == '2' || event.key == '3'
+                || event.key == '4' || event.key == '5'
+                || event.key == '6' || event.key == '7'
+                || event.key == '8' || event.key == '9'
+                || event.key == '+' || event.key == '-'
+                || event.key == '*' || event.key == '/')
+                document.getElementById("result").value += event.key;
+        }
+
+        var cal = document.getElementById("calcu");
+        cal.onkeyup = function (event) {
+            if (event.keyCode === 13) {
+                console.log("Enter");
+                let x = document.getElementById("result").value
+                console.log(x);
+                solve();
+            }
+        }
+
+
+        function solve() {
+            let x = document.getElementById("result").value;
+            let y = Number(evil(x));
+            if (isNaN(y)) {
+                document.getElementById('result').value = 'Invalid syntex';
+                return;
+            }
+            document.getElementById("result").value = y;
+            const expression = x;
+            const result = y;
+            //ajax call will save the payload and return a list of saved searches
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                const response = JSON.parse(this.responseText);
+                if (response.status == 201) fetchSavedSearches();
+            }
+            xhttp.open("GET", `backend/addSavedSearches.php?expression=${expression}&result=${result}`);
+            xhttp.send();
+        }
+
+        function fetchSavedSearches() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                generateSavedSearcesTable(JSON.parse(this.responseText));
+            }
+            xhttp.open("GET", "backend/listSavedSearches.php");
+            xhttp.send();
+        }
+
+        function generateSavedSearcesTable(savedSearches) {
+            let htmlText = '<tr class="savedSearch"><th>Id</th><th>Expression</th><th>Result</th><th>Executed On</th></tr>';
+            savedSearches.map((each, index) => {
+                htmlText += `<tr class="savedSearch"><td>${index + 1}</td><td>${each.expression}</td><td>${each.result}</td><td>${each.createdOn}</td></tr>`;
+            })
+            document.getElementById('savedSearches').innerHTML = htmlText;
+        }
+
+
+        function evil(fn) {
+            try {
+                return new Function('return ' + fn)();
+            } catch (ex) {
+                document.getElementById('result').value = 'Invalid syntex';
+                return;
+            }
+        }
+
+        function clr() {
+            document.getElementById("result").value = ""
+        }
+    </script>
+</body>
+
+</html>
